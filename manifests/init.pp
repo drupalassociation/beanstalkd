@@ -23,6 +23,10 @@
 #   Whether the beanstalkd package is present. Defaults to 'present'. Other 
 #   values are 'latest', or a specific version.
 #
+# [*manage_service*]
+#   Whether to manage the service through this module, which will enforce
+#   that the service is either running or stopped. Defaults to true.
+#
 # [*service_ensure*]
 #   Whether the beanstalkd service should be running. Defaults to 'running'.
 #   Other value is 'stopped'.
@@ -76,6 +80,7 @@ class beanstalkd (
   $enable_binlog    = $beanstalkd::params::enable_binlog,
   $binlog_directory = $beanstalkd::params::binlog_directory,
   $package_ensure   = $beanstalkd::params::package_ensure,
+  $manage_service   = $beanstalkd::params::manage_service,
   $service_ensure   = $beanstalkd::params::service_ensure,
   $service_enable   = $beanstalkd::params::service_enable,
   $user             = $beanstalkd::params::user,
@@ -87,7 +92,13 @@ class beanstalkd (
   # http://docs.puppetlabs.com/puppet/2.7/reference/lang_containment.html#known-issues
   anchor { 'beanstalkd::begin': } ->
   class { '::beanstalkd::install': } ->
-  class { '::beanstalkd::config': } ~>
-  class { '::beanstalkd::service': } ->
+
+  if ($manage_service) {
+    class { '::beanstalkd::config': } ~>
+    class { '::beanstalkd::service': } ->
+  } else {
+    class { '::beanstalkd::config': } ->
+  }
+
   anchor { 'beanstalkd::end': }
 }
