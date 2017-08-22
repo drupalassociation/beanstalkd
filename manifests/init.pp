@@ -96,9 +96,9 @@ class beanstalkd (
   if ($manage_service) {
     class { '::beanstalkd::config': } ~>
     class { '::beanstalkd::service': } ->
+    anchor { 'beanstalkd::end': }
   } else {
     class { '::beanstalkd::config': } ->
+    anchor { 'beanstalkd::end': }
   }
-
-  anchor { 'beanstalkd::end': }
 }
